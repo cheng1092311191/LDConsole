@@ -18,6 +18,9 @@ struct SimulatorInfo_t
 	DWORD VBoxPid;
 };
 
+/*
+* ²Ù×÷ ldconsole.exe
+*/
 class CLDConsole
 {
 public:
