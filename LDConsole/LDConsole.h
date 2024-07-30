@@ -52,6 +52,19 @@ enum SimulatorAttribute
 	//<1 | 0>
 	lockwindow = 0x1000,
 };
+enum keyboard 
+{
+	//返回键
+	back=1,
+	//home键
+	home,
+	//菜单键
+	menu,
+	//音量+
+	volumeup,
+	//音量-
+	volumedown,
+};
 /*
 * 操作 ldconsole.exe
 */
@@ -195,6 +208,145 @@ public:
 	*  val = 经度,纬度
 	*/
 	void locate(const char* Name, const char* val);
+
+	/*
+	* 设置属性
+	* --key "phone.imei" --value "auto"
+	* --key "phone.imsi" --value "auto"
+	* --key "phone.simserial" --value "auto"
+	*/
+	void setprop(int Index,const char * Key, const char* val);
+	/*
+	* 设置属性
+	* --key "phone.imei" --value "auto"
+	* --key "phone.imsi" --value "auto"
+	* --key "phone.simserial" --value "auto"
+	*/
+	void setprop(const char * Name,const char * Key, const char* val);
+	/*
+	* 设置系统属性
+	*/
+	CString getprop(int Index, const char* Key);
+	/*
+	* 设置系统属性
+	*/
+	CString getprop(const char* Name, const char* Key);
+
+	/*
+	* 全局设置
+	*	fps：模拟器帧率[0, 60]
+	*	audio：音频，打开=1，关闭=0
+	*	fastpaly : 快速显示模式，打开=1，关闭=0
+	*/
+	void globalsetting(const char* Key, const char* val);
+
+	/*
+	* 降低cpu占用
+	*  <0~100>
+	*/
+	void downcpu(int Index,UINT8 rate);
+	/*
+	* 降低cpu占用
+	*/
+	void downcpu(const char* Name, UINT8 rate);
+	/*
+	* 重启模拟器
+	*/
+	void reboot(int Index);
+	/*
+	* 重启模拟器
+	*/
+	void reboot(const char* Name);
+
+	/*
+	* 动作
+	* --key call.keyboard --value back
+	* --key call.reboot --value com.android.settings
+	* --key call.locate --value 12.3,45.6
+	* --key call.shake --value null
+	*/
+	void action(int Index,const char * Key,const char* val);
+	void action(const char* Name, const char* Key, const char* val);
+	/*
+	* 动作-按键
+	*/
+	void action_keyboard(int Index, enum keyboard type);
+	void action_keyboard(const char* Name, enum keyboard type);
+	/*
+	* 动作-摇一摇
+	*/
+	void action_shake(int Index);
+	/*
+	* 动作-摇一摇
+	*/
+	void action_shake(const char* Name);
+
+	/*
+	* 动作-重启模拟器,并启动应用
+	* PackageName: 应用包名
+	*/
+	void action_reboot(int Index,const char * PackageName);
+	/*
+	* 动作-重启模拟器,并启动应用
+	* PackageName: 应用包名
+	*/
+	void action_reboot(const char* Name,const char * PackageName);
+	/*
+	* 动作-定位
+	* val:  采用国际坐标（WGS84），格式为：“纬度,经度”。例如：“39.908821,116.397469”
+	*/
+	void action_locate(int Index, const char* val);
+	/*
+	* 动作-定位
+	* val:  采用国际坐标（WGS84），格式为：“纬度,经度”。例如：“39.908821,116.397469”
+	*/
+	void action_locate(const char* Name, const char* val);
+	/*
+	* 动作-文字输入
+	*/
+	void action_input(int Index, const char* val);
+	/*
+	* 动作-文字输入
+	*/
+	void action_input(const char* Name, const char* val);
+
+	/*
+	* 动作-网络连接/断开
+	* isConnect: true 连接, false 断开
+	*/
+	void action_network(int Index, bool isConnect);
+	/*
+	* 动作-网络连接/断开
+	* isConnect: true 连接, false 断开
+	*/
+	void action_network(const char* Name, bool isConnect);
+	/*
+	* 动作-重力感应
+	*/
+	void action_gravity(int Index, int x, int y, int z);
+	void action_gravity(const char* Name, int x, int y, int z);
+
+	/*
+	* 扫描二维码
+	* file: 完整文件路径
+	*/
+	void scan(int Index, const char* File);
+	/*
+	* 扫描二维码
+	* file: 完整文件路径
+	*/
+	void scan(const char* Name, const char* File);
+
+	/*
+	* 启动模拟器-并自动运行应用
+	* PackageName: 应用包名
+	*/
+	void launchex(int Index, const char* PackageName);
+	/*
+	* 启动模拟器-并自动运行应用
+	* PackageName: 应用包名
+	*/
+	void launchex(const char* Name, const char* PackageName);
 private:
 	CString m_InstallDir;
 	CString m_Path;

@@ -7,7 +7,7 @@ using namespace std;
 
 int main()
 {
-	CLDConsole ld("E:\\LeiDian\\LDPlayer4.0");
+	CLDConsole ld("E:\\LeiDian\\LDPlayer9");
 	cout << ld.List2() << endl;
 	//ld.Launch(0);
 	//ld.Launch("utfy97");
@@ -36,5 +36,18 @@ int main()
 	//ld.uninstallapp(6, "com.neowiz.playstudio.slot.casino");
 	//ld.Quit(6);
 	//ld.locate(6, "118.8091619999999,32.04241000000003");
+	//ld.setprop(6, "phone.imei", "auto");
+	//cout << ld.getprop(6, "phone.imsi") << endl;
+	//ld.globalsetting("audio", "0");
+	//ld.reboot(6);
+	//ld.Launch(5);
+	//ld.action_shake(5);
+	//ld.action_keyboard(5, keyboard::volumeup);
+	//ld.action_reboot(5, "com.android.settings");
+	//ld.action_input(5, "ÎÒÊÇÎÄ×Ö");
+	//ld.action_network(5, false);
+	//ld.action_network(5, true);
+	//ld.launchex(5, "com.android.settings");
+	ld.action_gravity(5, 50, 30, 20);
 	return 0;
 }
