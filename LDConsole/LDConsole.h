@@ -7,7 +7,7 @@
 #include<cstringt.h>
 using namespace std;
 
-struct SimulatorInfo_t
+struct EmulatorInfo_t
 {
 	int	Index;
 	char Name[1024];
@@ -17,7 +17,7 @@ struct SimulatorInfo_t
 	DWORD Pid;
 	DWORD VBoxPid;
 };
-enum SimulatorAttribute
+enum EmulatorAttribute
 {
 	// 自定义分辨率 例: 值=  600,360,160 表示 600*300 160pdi
 	resolution = 1,
@@ -102,11 +102,11 @@ public:
 	/*
 	* 修改模拟器属性 重载 index
 	*/
-	void Modify(int Index ,SimulatorAttribute Flag, const char* val);
+	void Modify(int Index ,EmulatorAttribute Flag, const char* val);
 	/*
 	* 修改模拟器属性 重载 name
 	*/
-	void Modify(const char * Name ,SimulatorAttribute Flag, const char* val);
+	void Modify(const char * Name ,EmulatorAttribute Flag, const char* val);
 
 	/*
 	* 新增模拟器
@@ -347,6 +347,53 @@ public:
 	* PackageName: 应用包名
 	*/
 	void launchex(const char* Name, const char* PackageName);
+
+
+
+
+	/*--------------------------adb shell ----------------------------*/
+	CString adb(int Index, const char* Command);
+	CString adb(const char* Name, const char* Command);
+
+	/*
+	* 查看设备
+	*/
+	CString devices();
+
+	/*
+	* 获取包列表
+		参数	显示内容
+		***		模糊查找 例如： hevc  查找带有 hevc 字符的应用
+		无		查看所有应用
+		-f		显示应用关联的 apk 文件
+		-d		只显示 disabled 的应用
+		-e		只显示 enabled 的应用
+		-s		只显示系统应用
+		-3		只显示第三方应用
+		-i		显示应用的 installer
+		-u		包含已卸载应用
+	*/
+	CString packages(int Index,const char * Param=  nullptr);
+	CString packages(const char* Name, const char* Param = nullptr);
+	/*
+	* 清除应用缓存
+	*/
+	void clear(int Index,const char * packagename);
+	/*
+	* 清除应用缓存
+	*/
+	void clear(const char* Name, const char* packagename);
+	/*
+	* 获取指定包名的APK路径
+	*/
+	CString path(int Index, const char* packagename);
+	/*
+	* 获取指定包名的APK路径
+	*/
+	CString path(const char* Name, const char* packagename);
+
+
+
 private:
 	CString m_InstallDir;
 	CString m_Path;

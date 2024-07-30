@@ -8,7 +8,7 @@ using namespace std;
 int main()
 {
 	CLDConsole ld("E:\\LeiDian\\LDPlayer9");
-	cout << ld.List2() << endl;
+	//cout << ld.List2() << endl;
 	//ld.Launch(0);
 	//ld.Launch("utfy97");
 	//ld.Launch(2);
@@ -48,6 +48,15 @@ int main()
 	//ld.action_network(5, false);
 	//ld.action_network(5, true);
 	//ld.launchex(5, "com.android.settings");
-	ld.action_gravity(5, 50, 30, 20);
+	//ld.action_gravity(5, 50, 30, 20);
+	CString str =ld.packages(6,"-f");
+	//adb --index 6 --command "shell pm list packages -f"
+	cout << str << endl;
+	//str.Replace("package:", "");
+	//ld.clear(6, "com.android.browser");
+	cout << ld.path(6, "com.android.browser") << endl;
+	cout << ld.devices() << endl;
+	
+	
 	return 0;
 }

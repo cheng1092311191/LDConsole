@@ -40,35 +40,66 @@ CString CLDConsole::Cmd(CString command)
 	sa.nLength = sizeof(SECURITY_ATTRIBUTES);
 	sa.bInheritHandle = TRUE;
 	sa.lpSecurityDescriptor = NULL;
-	CreatePipe(&hReadPipe, &hWritePipe, &sa, PIPE_SIZE);
+	CreatePipe(&hReadPipe, &hWritePipe, &sa, 0);
 
 	//CloseHandle(hReadPipe);
 	Info.hStdError = hWritePipe;
 	Info.hStdOutput = hWritePipe;
-	//Info.hStdInput = hWritePipe;
+	Info.hStdInput = hReadPipe;
 	Info.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
 	Info.wShowWindow = SW_HIDE;
 
 	PROCESS_INFORMATION p;
 	CString cmd;
 	cmd = m_Path + " " + command;
-	
-	BOOL ok =  ::CreateProcessA(NULL, (LPSTR)cmd.GetBuffer(), NULL, NULL, TRUE, NULL, NULL, NULL, &Info, &p);
+	BOOL ok = ::CreateProcessA(NULL, cmd.GetBuffer(), &sa, NULL, TRUE, NULL, NULL, NULL, &Info, &p);
 	DWORD WaitRet;
-	WaitRet = ::WaitForSingleObject(p.hProcess, INFINITE);
-	//WaitRet =::WaitForInputIdle(p.hProcess, 5 * 1000);
+
+	WaitRet =::WaitForInputIdle(p.hProcess,1000);
 	//WAIT_FAILED;
 
-	DWORD size=0;
-	//char buf[PIPE_SIZE] = { 0 };
-	ok = ::PeekNamedPipe(hReadPipe, NULL, NULL, NULL, &size, NULL);
-	//分配 pipe_size  初始化 0
-	CString out('\0', PIPE_SIZE + 1);
+	DWORD size = 0;
+	CString out;
 
-	if (size)
+	while (true)
 	{
-		::ReadFile(hReadPipe, (PVOID)out.GetBuffer(), size, NULL,NULL);
+		ok = ::PeekNamedPipe(hReadPipe, NULL, NULL, NULL, &size, NULL);
+		if (size >0)
+		{
+			char* buf = (char*)malloc(size+1);
+			if (buf==nullptr)
+			{
+				break;
+			}
+			memset(buf, 0, size + 1);
+			ok = ::ReadFile(hReadPipe, buf, size, NULL, NULL);
+			out.Append(buf);
+			free(buf);
+		}
+		else
+		{
+			DWORD exitCode;
+			GetExitCodeProcess(p.hProcess, &exitCode);
+			if (exitCode!= STILL_ACTIVE)
+			{
+				break;
+			}
+		}
+		Sleep(1);
+		
 	}
+
+
+
+
+	//ok = ::PeekNamedPipe(hReadPipe, NULL, NULL, NULL, &size, NULL);
+	////分配 pipe_size  初始化 0
+
+
+	//if (size)
+	//{
+	//	::ReadFile(hReadPipe, (PVOID)out.GetBuffer(), size, NULL,NULL);
+	//}
 
 
 	::CloseHandle(p.hProcess);
@@ -129,7 +160,7 @@ void CLDConsole::QuitAll()
 /*
 * 修改模拟器属性 重载 index
 */
-void CLDConsole::Modify(int Index,SimulatorAttribute Flag,const char* val)
+void CLDConsole::Modify(int Index,EmulatorAttribute Flag,const char* val)
 {
 	CString Param;
 	Param.Format("modify --index %d ", Index);
@@ -184,7 +215,7 @@ void CLDConsole::Modify(int Index,SimulatorAttribute Flag,const char* val)
 /*
 * 修改模拟器属性 重载 name
 */
-void CLDConsole::Modify(const char* Name, SimulatorAttribute Flag, const char* val)
+void CLDConsole::Modify(const char* Name, EmulatorAttribute Flag, const char* val)
 {
 	CString Param;
 	Param.Format("modify --name %s ", Name);
@@ -761,4 +792,77 @@ void CLDConsole::launchex(const char* Name, const char* PackageName)
 	CString Param;
 	Param.Format("launchex --name %s  --packagename %s", Name, PackageName);
 	this->Cmd(Param);
+}
+
+CString CLDConsole::adb(int Index, const char* Command)
+{
+	CString Param;
+	Param.Format("adb --index %d --command \"%s\"",Index, Command);
+	return this->Cmd(Param);
+}
+CString CLDConsole::adb(const char* Name, const char* Command)
+{
+	CString Param;
+	Param.Format("adb --name %s --command \"%s\"",Name, Command);
+	return this->Cmd(Param);
+}
+CString CLDConsole::devices()
+{
+	//填0 即可
+	return this->adb(0,"devices");
+}
+/*
+* 获取包列表
+* adb --name *** --command "shell pm list packages"
+*/
+CString CLDConsole::packages(int Index, const char* Param)
+{
+	CString cmdstr("shell pm list packages");
+	if (Param!= nullptr)
+	{
+		cmdstr.AppendFormat(" %s", Param);
+	}
+	return this->adb(Index, cmdstr);
+}
+CString CLDConsole::packages(const char* Name, const char* Param)
+{
+	CString cmdstr("shell pm list packages");
+	if (Param != nullptr)
+	{
+		cmdstr.AppendFormat(" %s", Param);
+	}
+	return this->adb(Name, cmdstr);
+}
+/*
+* 清除应用缓存
+*/
+void CLDConsole::clear(int Index, const char* packagename)
+{
+	CString Param;
+	Param.Format("shell pm clear %s", packagename);
+	this->adb(Index, Param);
+}
+
+void CLDConsole::clear(const char* Name, const char* packagename)
+{
+	CString Param;
+	Param.Format("shell pm clear %s", packagename);
+	this->adb(Name, Param);
+}
+/*
+* 获取指定包名的APK路径
+* adb shell pm path packageName
+*/
+CString CLDConsole::path(int Index, const char* packagename)
+{
+	CString Param;
+	Param.Format("shell pm path %s",packagename);
+	return adb(Index,Param);
+}
+
+CString CLDConsole::path(const char* Name, const char* packagename)
+{
+	CString Param;
+	Param.Format("shell pm path %s", packagename);
+	return adb(Name, Param);
 }
