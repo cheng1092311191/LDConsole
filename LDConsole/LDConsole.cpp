@@ -45,7 +45,7 @@ CString CLDConsole::Cmd(CString command)
 	//CloseHandle(hReadPipe);
 	Info.hStdError = hWritePipe;
 	Info.hStdOutput = hWritePipe;
-	Info.hStdInput = hReadPipe;
+	Info.hStdInput =NULL;
 	Info.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
 	Info.wShowWindow = SW_HIDE;
 
