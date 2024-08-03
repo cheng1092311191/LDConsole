@@ -3,8 +3,6 @@
 #pragma comment(lib,"LDConsole.lib")
 using namespace std;
 
-
-
 int main()
 {
 	CLDConsole ld("E:\\LeiDian\\LDPlayer9");
@@ -49,14 +47,15 @@ int main()
 	//ld.action_network(5, true);
 	//ld.launchex(5, "com.android.settings");
 	//ld.action_gravity(5, 50, 30, 20);
-	CString str =ld.packages(6,"-f");
+	//CString str =ld.packages(6,"-f");
 	//adb --index 6 --command "shell pm list packages -f"
-	cout << str << endl;
+	//cout << str << endl;
 	//str.Replace("package:", "");
 	//ld.clear(6, "com.android.browser");
+	
 	cout << ld.path(6, "com.android.browser") << endl;
 	cout << ld.devices() << endl;
-	
+	cout << ld.pid(6, "com.android.browser") << endl;
 	
 	return 0;
 }

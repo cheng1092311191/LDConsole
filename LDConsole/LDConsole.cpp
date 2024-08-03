@@ -3,7 +3,7 @@
 
 #include "pch.h"
 #include "framework.h"
-
+#include"help.h"
 #include"LDConsole.h"
 
 #define EXECUTE_FILE	"ldconsole.exe"
@@ -13,17 +13,9 @@ CLDConsole::CLDConsole()
 }
 
 CLDConsole::CLDConsole(const char* InstallDir)
-	:m_InstallDir(InstallDir)
 {
-
-	if (m_InstallDir.IsEmpty()) throw "安装目录不正确";
-	size_t size = m_InstallDir.GetLength();
-	if (m_InstallDir.GetAt(size-1) != '\\') m_InstallDir.Append("\\");
-
-	m_Path = m_InstallDir + EXECUTE_FILE;
-	if (::GetFileAttributes(m_Path.GetBuffer()) == INVALID_FILE_ATTRIBUTES)
+	if(!SetInstallDir(InstallDir))
 		throw "安装目录不正确";
-
 }
 
 CLDConsole::~CLDConsole()
@@ -108,6 +100,22 @@ CString CLDConsole::Cmd(CString command)
 	::CloseHandle(hReadPipe);
 
 	return out;
+}
+
+bool CLDConsole::SetInstallDir(CString InstallDir)
+{
+
+
+	if (InstallDir.IsEmpty()) return false;
+	size_t size = InstallDir.GetLength();
+	if (InstallDir.GetAt(size - 1) != '\\') InstallDir.Append("\\");
+
+	CString Path = InstallDir + EXECUTE_FILE;
+	if (::GetFileAttributes(Path.GetBuffer()) == INVALID_FILE_ATTRIBUTES)
+		return false;
+	m_Path = Path;
+	m_InstallDir = InstallDir;
+	return true;
 }
 
 CString CLDConsole::List2()
@@ -865,4 +873,47 @@ CString CLDConsole::path(const char* Name, const char* packagename)
 	CString Param;
 	Param.Format("shell pm path %s", packagename);
 	return adb(Name, Param);
+}
+/*
+*  进程列表
+*/
+CString CLDConsole::ps(int Index)
+{
+	CString Param;
+	Param.Format("shell ps");
+	return this->adb(Index, Param);
+}
+
+CString CLDConsole::ps(const char* Name)
+{
+	CString Param;
+	Param.Format("shell ps");
+	return this->adb(Name, Param);
+}
+
+int CLDConsole::pid(int Index, const char* packagename)
+{
+	CString result = this->ps(Index);
+	vector<CString> resAry  =  Split(result, "\r\r\n");
+	vector<CString>::iterator begin, end;
+	int pid = 0;
+	for (begin =resAry.begin(),end = resAry.end(); begin != end; begin++)
+	{
+
+			vector<CString> row = Split(*begin, " ");
+			//小于9个数组 说明格式不对
+			if (row.size()<9)
+			{
+				continue;
+			}
+
+			if (row[8].Compare(packagename)==0)
+			{
+				pid = strtol(row[1],NULL,10);
+				break;
+			}
+	}
+
+
+	return pid;
 }

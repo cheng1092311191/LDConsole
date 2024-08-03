@@ -17,6 +17,18 @@ struct EmulatorInfo_t
 	DWORD Pid;
 	DWORD VBoxPid;
 };
+struct adb_ProcessInfo_t
+{
+	char User[MAX_PATH];
+	int pid;
+	int ppid;
+	size_t VSize;
+	size_t RSS;
+	size_t WCHAN;
+	size_t PC;
+	char State[MAX_PATH];
+	char Name[MAX_PATH];
+};
 enum EmulatorAttribute
 {
 	// 自定义分辨率 例: 值=  600,360,160 表示 600*300 160pdi
@@ -65,6 +77,7 @@ enum keyboard
 	//音量-
 	volumedown,
 };
+
 /*
 * 操作 ldconsole.exe
 */
@@ -78,6 +91,7 @@ public:
 	CString Cmd(CString command);
 
 public:
+	bool SetInstallDir(CString InstallDir);
 	CString List2();
 	/*
 	* 启动模拟器 index
@@ -392,6 +406,18 @@ public:
 	*/
 	CString path(const char* Name, const char* packagename);
 
+	/*
+	* 进程列表
+	*/
+	CString ps(int Index);
+	/*
+	* 进程列表
+	*/
+	CString ps(const char* Name);
+	/*
+	* 获取指定包名的进程id
+	*/
+	int pid(int Index, const char* packagename);
 
 
 private:
